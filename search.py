@@ -91,11 +91,12 @@ def depthFirstSearch(problem):
     frontier.push(currentState)
     explored = [currentState]
     path = []
-    # saves the last coordinates where the path branches
+    # saves the last coordinates where the path branches to backtrack later
     lastBranchingPathIndexes = []
 
     while not problem.isGoalState(currentState):
         children = problem.getSuccessors(currentState)
+        # number of unexplored children of the current node
         unexplored = 0
         for child in children:
             if child[0] not in explored:            
@@ -103,10 +104,11 @@ def depthFirstSearch(problem):
                 unexplored += 1     
         currentStateWithDirection = frontier.pop()
         currentState = currentStateWithDirection[0]
+
         if unexplored == 0:
-            if len(lastBranchingPathIndexes) > 0:     
-                lastIndex = lastBranchingPathIndexes.pop()  
-                path = path[:lastIndex]             
+            if len(lastBranchingPathIndexes) > 0:
+                # cut nodes from the end of path up to last branching of path
+                path = path[:lastBranchingPathIndexes.pop()]             
         elif unexplored > 1:
             while unexplored > 1:
                 lastBranchingPathIndexes.append(len(path))
