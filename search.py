@@ -86,8 +86,39 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    currentState = problem.getStartState()
+    frontier = util.Stack()
+    frontier.push(currentState)
+    explored = [currentState]
+    path = []
+    # saves the last coordinates where the path branches
+    lastBranchingPathIndexes = []
+
+    while not problem.isGoalState(currentState):
+        children = problem.getSuccessors(currentState)
+        unexplored = 0
+        for child in children:
+            if child[0] not in explored:            
+                frontier.push(child)
+                unexplored += 1     
+        currentStateWithDirection = frontier.pop()
+        currentState = currentStateWithDirection[0]
+        if unexplored == 0:
+            if len(lastBranchingPathIndexes) > 0:     
+                lastIndex = lastBranchingPathIndexes.pop()  
+                path = path[:lastIndex]             
+        elif unexplored > 1:
+            while unexplored > 1:
+                lastBranchingPathIndexes.append(len(path))
+                unexplored -= 1
+        explored.append(currentState)
+
+        # alternative for testing (in that case the line that returns the path has to be exchanged too):
+        #path.append(currentStateWithDirection)
+        path.append(currentStateWithDirection[1])
+    # alternative for testing:
+    #return [item[1] for item in path]
+    return path    
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
