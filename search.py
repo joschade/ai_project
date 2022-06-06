@@ -88,7 +88,6 @@ def depthFirstSearch(problem):
     """
     currentState = problem.getStartState()
     frontier = util.Stack()
-    frontier.push(currentState)
     explored = [currentState]
     path = []
     # saves the last coordinates where the path branches to backtrack later
