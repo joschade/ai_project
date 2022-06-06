@@ -96,23 +96,25 @@ def depthFirstSearch(problem):
 
     while not problem.isGoalState(currentState):
         children = problem.getSuccessors(currentState)
-        # number of unexplored children of the current node
-        unexplored = 0
+        # number of children of the current node, which are not yet explored
+        numUnexploredChildren = 0
         for child in children:
             if child[0] not in explored:            
                 frontier.push(child)
-                unexplored += 1     
+                numUnexploredChildren += 1     
         currentStateWithDirection = frontier.pop()
         currentState = currentStateWithDirection[0]
 
-        if unexplored == 0:
+        # no more children of current node to explore
+        if numUnexploredChildren == 0:
             if len(lastBranchingPathIndexes) > 0:
                 # cut nodes from the end of path up to last branching of path
-                path = path[:lastBranchingPathIndexes.pop()]             
-        elif unexplored > 1:
-            while unexplored > 1:
+                path = path[:lastBranchingPathIndexes.pop()]     
+        # path branches and multiple children can be explored        
+        elif numUnexploredChildren > 1:
+            while numUnexploredChildren > 1:
                 lastBranchingPathIndexes.append(len(path))
-                unexplored -= 1
+                numUnexploredChildren -= 1
         explored.append(currentState)
 
         # alternative for testing (in that case the line that returns the path has to be exchanged too):
