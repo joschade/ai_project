@@ -92,26 +92,24 @@ def depthFirstSearch(problem):
     currentState = problem.getStartState()
     frontier = util.Stack()
     explored = [currentState]
-    chain = {}
-    currentStateRaw = (currentState, 'None', 0)
+    currentStateRaw, path = ((currentState, 'None', 0), [])
 
 
     while not problem.isGoalState(currentStateRaw[0]):
         children = problem.getSuccessors(currentStateRaw[0])
         for child in children:
             if child[0] not in explored:
-                frontier.push(child)
-                chain[child]=currentStateRaw
-        #print(f'frontier.isEmpty() = {frontier.isEmpty()}')
+                childPath = path + [child[1]]
+                frontier.push((child, childPath))
+        print(f'frontier.isEmpty() = {frontier.isEmpty()}')
         if not frontier.isEmpty():
-            currentStateRaw  = frontier.pop()
+            currentStateRaw, path = frontier.pop()
             #print(f' currentStateRaw = { currentStateRaw}')
             #print(f'currentStateRaw[0] = {currentStateRaw[0]}, currentStateRaw[1] = {currentStateRaw[1]}')
             currentState = currentStateRaw[0]
+            print(f'path = {path}, currentState = {currentState}')
+            if problem.isGoalState(currentState): return path
 
-            #print(f'currentState = {currentState}')
-            #print(f'currentState is goal state: {problem.isGoalState(currentState)}')
-            #print(f'chain = {chain.items()}')
             explored.append(currentState)
 
 
@@ -119,18 +117,7 @@ def depthFirstSearch(problem):
 
 
 
-    path = []
-    i=0
-    state = currentStateRaw
-    while state[0] != problem.getStartState() and i<20:
-        #print(f'state = {state}, chain[state] = {chain[state]}')
-        path.insert(0, state[1])
-        #print(f'path = {path}')
-        state = chain[state]
 
-
-
-    return path
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -177,7 +164,32 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    currentState = problem.getStartState()
+    frontier = util.PriorityQueue()
+    explored = [currentState]
+    currentStateRaw, path = ((currentState, 'None', 0), [])
+
+    while not problem.isGoalState(currentStateRaw[0]):
+        children = problem.getSuccessors(currentStateRaw[0])
+        for child in children:
+            if child[0] not in explored:
+                childPath = path + [child[1]]
+                frontier.push((child, childPath), currentStateRaw[2] + child[2])
+        print(f'frontier.isEmpty() = {frontier.isEmpty()}')
+        if not frontier.isEmpty():
+            currentStateRaw, path = frontier.pop()
+            # print(f' currentStateRaw = { currentStateRaw}')
+            # print(f'currentStateRaw[0] = {currentStateRaw[0]}, currentStateRaw[1] = {currentStateRaw[1]}')
+            currentState = currentStateRaw[0]
+            print(f'path = {path}, currentState = {currentState}')
+            if problem.isGoalState(currentState): return path
+
+            explored.append(currentState)
+
+
+        else:
+            return []
 
 def nullHeuristic(state, problem=None):
     """
