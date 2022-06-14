@@ -101,13 +101,11 @@ def depthFirstSearch(problem):
             if child[0] not in explored:
                 childPath = path + [child[1]]
                 frontier.push((child, childPath))
-        print(f'frontier.isEmpty() = {frontier.isEmpty()}')
         if not frontier.isEmpty():
             currentStateRaw, path = frontier.pop()
             #print(f' currentStateRaw = { currentStateRaw}')
             #print(f'currentStateRaw[0] = {currentStateRaw[0]}, currentStateRaw[1] = {currentStateRaw[1]}')
             currentState = currentStateRaw[0]
-            print(f'path = {path}, currentState = {currentState}')
             if problem.isGoalState(currentState): return path
 
             explored.append(currentState)
@@ -123,42 +121,41 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
+    def stateInFrontier(state, frontier):
+        result = False
+        for item in frontier.list:
+            if item[0][0] == state: result = True
+        return result
+
+
     currentState = problem.getStartState()
-    frontier = util.Stack()
-    explored = [currentState]
-    path = []
-    # saves the last coordinates where the path branches to backtrack later
-    lastBranchingPathIndexes = []
+    frontier = util.Queue()
+    explored = []
+    currentNode = ((currentState, None, 0), None)
+    frontier.push(currentNode)
 
-    while not problem.isGoalState(currentState):
-        children = problem.getSuccessors(currentState)
-        # number of children of the current node, which are not yet explored
-        numUnexploredChildren = 0
-        for child in children:
-            if child[0] not in explored:
-                frontier.push(child)
-                numUnexploredChildren += 1
-        currentStateWithDirection = frontier.pop()
-        currentState = currentStateWithDirection[0]
+    while not frontier.isEmpty():
+        currentNode = frontier.pop()
+        explored.append(currentNode[0][0])
+        if problem.isGoalState(currentNode[0][0]):
+            path = []
+            while currentNode[1] is not None:
+                path.insert(0, currentNode[0][1])
+                currentNode = currentNode[1]
+            return path
+        for succ in problem.getSuccessors(currentNode[0][0]):
+            #print(f'succ[0] not in explored: {succ[0] not in explored}, stateInFrontier(succ[0], frontier): {stateInFrontier(succ[0], frontier)}')
+            if succ[0] not in explored and not stateInFrontier(succ[0], frontier):
+                frontier.push((succ, currentNode))
 
-        # no more children of current node to explore
-        if numUnexploredChildren == 0:
-            if len(lastBranchingPathIndexes) > 0:
-                # cut nodes from the end of path up to last branching of path
-                path = path[:lastBranchingPathIndexes.pop()]
-                # path branches and multiple children can be explored
-        elif numUnexploredChildren > 1:
-            while numUnexploredChildren > 1:
-                lastBranchingPathIndexes.append(len(path))
-                numUnexploredChildren -= 1
-        explored.append(currentState)
+                #print(f'{succ, currentNode} pushed')
 
-        # alternative for testing (in that case the line that returns the path has to be exchanged too):
-        # path.append(currentStateWithDirection)
-        path.append(currentStateWithDirection[1])
-    # alternative for testing:
-    # return [item[1] for item in path]
-    return path
+
+
+
+
+
+    util.raiseNotDefined()
 
 
 def uniformCostSearch(problem):
