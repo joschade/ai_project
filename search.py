@@ -136,10 +136,8 @@ def breadthFirstSearch(problem):
                 currentNode = currentNode[1]
             return path
         for succ in problem.getSuccessors(currentNode[0][0]):
-            #print(f'succ[0] not in explored: {succ[0] not in explored}, stateInFrontier(succ[0], frontier): {stateInFrontier(succ[0], frontier)}')
             if succ[0] not in explored and not stateInFrontier(succ[0], frontier):
                 frontier.push((succ, currentNode))
-                #print(f'{succ, currentNode} pushed')
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
