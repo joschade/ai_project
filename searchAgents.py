@@ -454,7 +454,30 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    #print(f'position, foodGrid ) {position, foodGrid}')
+    from math import inf, sqrt
+
+    def euclideanDistance(xy1, xy2):
+        "Returns the Euclidean distance between points xy1 and xy2"
+        return sqrt((xy1[0] - xy2[0])**2 + (xy1[1] - xy2[1])**2)
+
+    def distance(xy_1, xy_2):
+        "to swap metric easily"
+        return euclideanDistance(xy_1, xy_2)
+        # return util.manhattanDistance(xy_1, xy_2)
+
+    dotLocations = foodGrid.asList()
+    if len(dotLocations) > 0: minPosDot = inf
+    else: minPosDot = 0  # catch case if list is empty, do NOT return infinite distance
+    maxDotDot=0 # accumulate all dist(dot, dot2) for all dots, dot2s
+    for dot in dotLocations:
+        if distance(dot, position) < minPosDot: minPosDot = distance(dot, position)
+        for dot2 in dotLocations:
+            if distance(dot, dot2) > maxDotDot:
+                maxDotDot = distance(dot, dot2)
+
+    print(f'minPosDot + maxDotDot = {minPosDot + maxDotDot}')
+    return minPosDot + maxDotDot
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
