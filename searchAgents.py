@@ -516,14 +516,12 @@ def foodHeuristic(state, problem):
     dotLocations = foodGrid.asList()
     if len(dotLocations) > 0: minPosDot = inf
     else: minPosDot = 0  # catch case if list is empty, do NOT return infinite distance
-    maxDotDot=0 # accumulate all dist(dot, dot2) for all dots, dot2s
+    maxDotDot = 0 # accumulate all dist(dot, dot2) for all dots, dot2s
     for dot in dotLocations:
         if distance(dot, position) < minPosDot: minPosDot = distance(dot, position)
         for dot2 in dotLocations:
             if distance(dot, dot2) > maxDotDot:
                 maxDotDot = distance(dot, dot2)
-
-    print(f'minPosDot + maxDotDot = {minPosDot + maxDotDot}')
     return minPosDot + maxDotDot
 
 class ClosestDotSearchAgent(SearchAgent):
