@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+import pacman
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -288,6 +289,10 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        startingGameState.visitedCorners = []
+        for corner in self.corners:
+            startingGameState.visitedCorners.append(True if self.startingPosition == corner else False)
+        self.startState = (self.startingPosition, startingGameState.visitedCorners)
 
     def getStartState(self):
         """
@@ -295,14 +300,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startState
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for cornerVisited in state[1]:
+            if (not cornerVisited):
+                return False
+        return True
 
     def getSuccessors(self, state):
         """
@@ -325,7 +333,16 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+            x, y = state[0]          
+            cornersVisited = list(state[1])
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                for i in range(len(cornersVisited)):                    
+                    if self.corners[i] == (nextx, nexty):
+                        cornersVisited[i] = True
+                successors.append((((nextx, nexty), cornersVisited), action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -342,7 +359,15 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
+"""
+The function checks which corners haven't been visited yet. For each unvisited corner the
+Manhattan distance between the current position of Pacman and the corner gets calculated
+and the corner with the minimum distance to Pacman is the corner that gets visited first.
+The distance to this corner is added to the total distance. This gets deleted from the list 
+of unvisited nodes and set as the new starting point of Pacman. This repeats until no corners
+are unvisited and the total distance is returned. The heuristic assumes that the maze has
+no walls (Manhattan distance). 
+"""
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -360,7 +385,29 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    x, y = state[0]
+    visitedCorners = state[1]
+    totalDist = 0
+    cornersToVisit = []
+    for i in range(len(visitedCorners)):
+        if not visitedCorners[i]:
+            cornersToVisit.append(corners[i])
+    while len(cornersToVisit) > 0:
+        minDist = -1
+        # iterate over corners to find the closest one
+        for i in range(len(cornersToVisit)):
+            distToCorner = util.manhattanDistance((x, y), (cornersToVisit[i][0], cornersToVisit[i][1]))
+            if minDist == -1 or distToCorner < minDist:
+                minDist = distToCorner
+                closestCornerIndex = i
+        # set the closest corner as the new starting point and remove it from cornersToVisit
+        closestCorner = cornersToVisit[closestCornerIndex]
+        x = closestCorner[0]
+        y = closestCorner[1]
+        del cornersToVisit[closestCornerIndex]
+        totalDist += minDist
+    return totalDist
+    #return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

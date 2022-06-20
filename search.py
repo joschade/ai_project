@@ -88,12 +88,10 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-
     currentState = problem.getStartState()
     frontier = util.Stack()
     explored = [currentState]
     currentStateRaw, path = ((currentState, 'None', 0), [])
-
 
     while not problem.isGoalState(currentStateRaw[0]):
         children = problem.getSuccessors(currentStateRaw[0])
@@ -106,27 +104,21 @@ def depthFirstSearch(problem):
             #print(f' currentStateRaw = { currentStateRaw}')
             #print(f'currentStateRaw[0] = {currentStateRaw[0]}, currentStateRaw[1] = {currentStateRaw[1]}')
             currentState = currentStateRaw[0]
-            if problem.isGoalState(currentState): return path
-
+            if problem.isGoalState(currentState): 
+                return path
             explored.append(currentState)
-
-
-        else: return []
-
-
-
-
+        else: 
+            return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
     def stateInFrontier(state, frontier):
-        result = False
         for item in frontier.list:
-            if item[0][0] == state: result = True
-        return result
-
+            if item[0][0] == state: 
+                return True
+        return False
 
     currentState = problem.getStartState()
     frontier = util.Queue()
@@ -144,19 +136,8 @@ def breadthFirstSearch(problem):
                 currentNode = currentNode[1]
             return path
         for succ in problem.getSuccessors(currentNode[0][0]):
-            #print(f'succ[0] not in explored: {succ[0] not in explored}, stateInFrontier(succ[0], frontier): {stateInFrontier(succ[0], frontier)}')
             if succ[0] not in explored and not stateInFrontier(succ[0], frontier):
                 frontier.push((succ, currentNode))
-
-                #print(f'{succ, currentNode} pushed')
-
-
-
-
-
-
-    util.raiseNotDefined()
-
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -164,29 +145,49 @@ def uniformCostSearch(problem):
 
     currentState = problem.getStartState()
     frontier = util.PriorityQueue()
-    explored = [currentState]
-    currentStateRaw, path = ((currentState, 'None', 0), [])
+    explored = []
+    currentNode = (currentState, [], 0)
+    frontier.push(currentNode, 0)
 
-    while not problem.isGoalState(currentStateRaw[0]):
-        children = problem.getSuccessors(currentStateRaw[0])
-        for child in children:
-            if child[0] not in explored:
-                childPath = path + [child[1]]
-                frontier.push((child, childPath), currentStateRaw[2] + child[2])
-        print(f'frontier.isEmpty() = {frontier.isEmpty()}')
-        if not frontier.isEmpty():
-            currentStateRaw, path = frontier.pop()
-            # print(f' currentStateRaw = { currentStateRaw}')
-            # print(f'currentStateRaw[0] = {currentStateRaw[0]}, currentStateRaw[1] = {currentStateRaw[1]}')
-            currentState = currentStateRaw[0]
-            print(f'path = {path}, currentState = {currentState}')
-            if problem.isGoalState(currentState): return path
+    while not frontier.isEmpty():
+        currentNode = frontier.pop()
+        currentState = currentNode[0]
+        path = currentNode[1]
+        if (currentState not in explored):
+            if problem.isGoalState(currentState):
+                return path
+            else:
+                explored.append(currentState)
+                for childState, action, childCost in problem.getSuccessors(currentState):
+                    newPath = path + [action]
+                    childCost = currentNode[2] + childCost
+                    child = (childState, newPath, childCost)
+                    frontier.update(child, childCost)
+    return []
 
-            explored.append(currentState)
+def greedyBestFirstSearch(problem):
+    """Search the node with the least immediate cost first"""
 
+    currentState = problem.getStartState()
+    frontier = util.PriorityQueue()
+    explored = []
+    currentNode = (currentState, [], 0)
+    frontier.push(currentNode, 0)
 
-        else:
-            return []
+    while not frontier.isEmpty():
+        currentNode = frontier.pop()
+        currentState = currentNode[0]
+        path = currentNode[1]
+        if (currentState not in explored):
+            if problem.isGoalState(currentState):
+                return path
+            else:
+                explored.append(currentState)
+                for childState, action, childCost in problem.getSuccessors(currentState):
+                    newPath = path + [action]
+                    child = (childState, newPath, childCost)
+                    frontier.update(child, childCost)
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -229,3 +230,7 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+gbfs = greedyBestFirstSearch
+
+# Alternatives
+GreedyBestFirstSearch = greedyBestFirstSearch
