@@ -479,6 +479,20 @@ def foodHeuristic(state, problem):
     print(f'minPosDot + maxDotDot = {minPosDot + maxDotDot}')
     return minPosDot + maxDotDot
 
+    "IQ7: We use the Euclidean distance as heuristic. As pacman can only move left, right, up, down, he can not do" \
+    "bertter than the 1-norm (so-called Manhattan metric). By the theorem of Pythagoras, " \
+
+    " EuclideanDistance(x.y) <= ManhattanDistance(x,y) <= PacmanDistance(x,y)." \
+
+    "Therefore, it is safeguarded that our heuristic is admissible." \
+    "By the triangle inequality in connection with Pythagoros' theorem, it also follows that the heuristic used is " \
+    "consistent:" \
+
+    "Cost(x,y) + EuclideanDistance(y,z) = ManhattanDistance(x,y) + EuclideanDistance(y,z) " \
+    "                                   <= ManhattanDistance(x,y) + ManhattanDistance(y,z) " \
+    "                                      = ManhattanDistance(x,z)" \
+
+
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
